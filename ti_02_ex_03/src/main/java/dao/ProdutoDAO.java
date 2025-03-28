@@ -1,6 +1,8 @@
 package dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProdutoDAO {
     private Connection conexao;
@@ -22,9 +24,7 @@ public class ProdutoDAO {
         try {
             Class.forName(driverName);
             conexao = DriverManager.getConnection(url, username, password);
-            if (conexao != null) {
-                status = true;
-            }
+            status = conexao != null;
         } catch (ClassNotFoundException e) {
             System.err.println("Conexão NÃO efetuada com o postgres -- Driver não encontrado -- " + e.getMessage());
         } catch (SQLException e) {
@@ -36,7 +36,6 @@ public class ProdutoDAO {
 
     public boolean close() {
         boolean status = false;
-
         try {
             if (conexao != null && !conexao.isClosed()) {
                 conexao.close();

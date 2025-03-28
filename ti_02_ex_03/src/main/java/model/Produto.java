@@ -94,11 +94,11 @@ public class Produto implements Serializable {
     @Override
     public String toString() {
         return "Produto: " + descricao + "   Preço: R$" + preco + "   Quant.: " + quantidade + "   Fabricação: "
-                + dataFabricacao  + "   Data de Validade: " + dataValidade;
+                + dataFabricacao + "   Data de Validade: " + dataValidade;
     }
 
     @Override
     public boolean equals(Object obj) {
         return (this.getId() == ((Produto) obj).getId());
-    }
+    }
 }
