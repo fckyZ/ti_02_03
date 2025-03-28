@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+</body>
+</html<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CRUD de Carros</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    form {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    input, button {
+        padding: 8px;
+        margin: 5px 0;
+    }
+    button {
+        cursor: pointer;
+    }
+    h1, #marca, #modelo, #ano, #preco
+    {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+</head>
+<body>
+<h1>CRUD de Carros</h1>
+
+<form id="carForm">
+    <input type="hidden" id="carId">
+    <div>
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" required>
+    </div>
+    <div>
+        <label for="modelo">Modelo:</label>
+        <input type="text" id="modelo" required>
+    </div>
+    <div>
+        <label for="ano">Ano:</label>
+        <input type="number" id="ano" required>
+    </div>
+       <div>
+        <label for="preco">Preço (R$):</label>
+        <input type="number" id="preco" min="0" step="0.01" required>
+    </div>
+    <div class="btns">
+        <button type="submit">Salvar</button>
+        <button type="button" onclick="limparFormulario()">Limpar</button>
+    </div>
+    
+</form>
+
+<table id="carTable">
+    <thead>
+        <tr>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Ano</th>
+            <th>Preço</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Os dados dos carros serão inseridos aqui via JavaScript -->
+    </tbody>
+</table>
+
+<script>
+    // Inicializa o "banco de dados" no localStorage se não existir
+    if (!localStorage.getItem('carros')) {
+        localStorage.setItem('carros', JSON.stringify([]));
+    }
+
+    // Função para obter todos os carros
+    function getCarros() {
+        return JSON.parse(localStorage.getItem('carros'));
+    }
+
+    // Função para salvar um carro
+    function salvarCarro(carro) {
+        const carros = getCarros();
+        if (carro.id) {
+            // Atualizar carro existente
+            const index = carros.findIndex(c => c.id === carro.id);
+            if (index !== -1) {
+                carros[index] = carro;
+            }
+        } else {
+            // Adicionar novo carro
+            carro.id = Date.now(); // ID único baseado no timestamp
+            carros.push(carro);
+        }
+        localStorage.setItem('carros', JSON.stringify(carros));
+        atualizarTabela();
+    }
+
+    // Função para excluir um carro
+    function excluirCarro(id) {
+        const carros = getCarros().filter(carro => carro.id !== id);
+        localStorage.setItem('carros', JSON.stringify(carros));
+        atualizarTabela();
+    }
+
+    // Função para preencher o formulário com os dados de um carro para edição
+    function editarCarro(id) {
+        const carro = getCarros().find(c => c.id === id);
+        if (carro) {
+            document.getElementById('carId').value = carro.id;
+            document.getElementById('marca').value = carro.marca;
+            document.getElementById('modelo').value = carro.modelo;
+            document.getElementById('ano').value = carro.ano;
+            document.getElementById('preco').value = carro.preco;
+        }
+    }
+
+    // Função para limpar o formulário
+    function limparFormulario() {
+        document.getElementById('carForm').reset();
+        document.getElementById('carId').value = '';
+    }
+
+    // Função para atualizar a tabela com os dados dos carros
+    function atualizarTabela() {
+        const tbody = document.querySelector('#carTable tbody');
+        tbody.innerHTML = '';
+        const carros = getCarros();
+        
+        carros.forEach(carro => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${carro.marca}</td>
+                <td>${carro.modelo}</td>
+                <td>${carro.ano}</td>
+                <td>${carro.preco}</td>
+                <td>R$ ${carro.preco.toFixed(2)}</td>
+                <td>
+                    <button onclick="editarCarro(${carro.id})">Editar</button>
+                    <button onclick="excluirCarro(${carro.id})">Excluir</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Event listener para o formulário
+    document.getElementById('carForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const carro = {
+            id: document.getElementById('carId').value ? parseInt(document.getElementById('carId').value) : null,
+            marca: document.getElementById('marca').value,
+            modelo: document.getElementById('modelo').value,
+            ano: parseInt(document.getElementById('ano').value),
+            preco: parseFloat(document.getElementById('preco').value)
+        };
+        
+        salvarCarro(carro);
+        limparFormulario();
+    });
+
+    // Inicializa a tabela quando a página carrega
+    window.onload = atualizarTabela;
+</script>
+</body>
+</html>
